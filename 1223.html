@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEVEL ARTIST | PORTFOLIO</title>
+    <style>
+        /* --- 全局基础设置 --- */
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --bg-dark: #050505;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Courier New', Courier, monospace; /* 代码风格字体 */
+            overflow-x: hidden;
+        }
+
+        /* --- 1. UE风格加载动画 --- */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease;
+        }
+        .loader-text {
+            font-size: 14px;
+            color: var(--neon-blue);
+            margin-bottom: 10px;
+            animation: blink 1s infinite;
+        }
+        .progress-bar {
+            width: 300px;
+            height: 4px;
+            background: #333;
+            position: relative;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--neon-blue);
+            transition: width 2s ease-in-out;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        /* --- 2. 顶部 Hero 区域 --- */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            /* 这里可以用你的UE视频替换背景 */
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+        }
+        
+        h1 {
+            font-size: 4rem;
+            text-transform: uppercase;
+            letter-spacing: 10px;
+            margin: 0;
+            text-shadow: 0 0 20px var(--neon-blue);
+            position: relative;
+        }
+        
+        h1::after {
+            content: 'LEVEL DESIGN / ENVIRONMENT ART';
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1rem;
+            letter-spacing: 5px;
+            color: rgba(255,255,255,0.6);
+            width: 100%;
+            text-align: center;
+        }
+
+        /* --- 3. 3D 模型展示容器 (赛博风格) --- */
+        section {
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            border-left: 5px solid var(--neon-blue);
+            padding-left: 20px;
+            font-size: 2rem;
+            margin-bottom: 50px;
+            text-transform: uppercase;
+        }
+
+        .model-showcase {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            border: 1px solid #333;
+            background: var(--bg-dark);
+            /* 炫酷边框效果 */
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.1);
+        }
+
+        /* 四角装饰 */
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-blue);
+            transition: all 0.3s;
+        }
+        .tl { top: -2px; left: -2px; border-bottom: none; border-right: none; }
+        .tr { top: -2px; right: -2px; border-bottom: none; border-left: none; }
+        .bl { bottom: -2px; left: -2px; border-top: none; border-right: none; }
+        .br { bottom: -2px; right: -2px; border-top: none; border-left: none; }
+
+        .model-showcase:hover .corner { width: 40px; height: 40px; box-shadow: 0 0 10px var(--neon-blue); }
+
+        iframe { width: 100%; height: 100%; border: none; }
+
+        /* --- 4. Before/After 对比滑块 (地编必备) --- */
+        .comparison-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            margin-top: 50px;
+            border: 1px solid #333;
+        }
+        
+        .img-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* 这里替换你的图片链接 */
+        .img-after { 
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop'); /* 最终渲染图 */
+        }
+        .img-before { 
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop&sat=-100'); /* 线框或白模图，这里暂时用黑白图代替 */
+            width: 50%; /* 初始位置 */
+            border-right: 3px solid var(--neon-blue);
+            z-index: 2;
+        }
+
+        .slider-handle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: var(--neon-blue);
+            border-radius: 50%;
+            z-index: 3;
+            cursor: ew-resize;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: black;
+            font-weight: bold;
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        /* --- 底部 --- */
+        footer {
+            padding: 50px;
+            text-align: center;
+            border-top: 1px solid #333;
+            color: #666;
+        }
+
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div class="loader-text">COMPILING SHADERS... <span id="percent">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="fill"></div></div>
+    </div>
+
+    <header>
+        <h1>UNREAL ARTIST</h1>
+        <p style="margin-top: 50px; color: var(--neon-blue); font-size: 12px;">[ SYSTEM READY ]</p >
+    </header>
+
+    <section>
+        <div class="section-title">01. INTERACTIVE ASSET</div>
+        <div class="model-showcase">
+            <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+            
+            <iframe title="Sci-Fi Box" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/162e89d456de45bcb41cd8a1a097077b/embed?autostart=1&ui_theme=dark&camera=0&dnt=1"> </iframe>
+        </div>
+        <p style="margin-top: 20px; color: #888;">* 使用鼠标左键旋转，右键平移，滚轮缩放。</p >
+    </section>
+
+    <section>
+        <div class="section-title">02. LIGHTING BREAKDOWN</div>
+        <p style="margin-bottom: 20px; color: #aaa;">WIRE FRAME / FINAL RENDER</p >
+        
+        <div class="comparison-container" id="slider-container">
+            <div class="img-layer img-after"></div>
+            <div class="img-layer img-before" id="before-img"></div>
+            <div class="slider-handle" id="handle"><></div>
+        </div>
+    </section>
+
+    <footer>
+        <p>POWERED BY UNREAL ENGINE 5 & WEBGL</p >
+        <p>&copy; 2024 YOUR NAME. ALL RIGHTS RESERVED.</p >
+    </footer>
+
+    <script>
+        // --- 脚本逻辑 ---
+
+        // 1. 模拟 Loading 动画
+        window.onload = function() {
+            const fill = document.getElementById('fill');
+            const percent = document.getElementById('percent');
+            const loader = document.getElementById('loader');
+            
+            fill.style.width = '100%';
+            
+            let count = 0;
+            let timer = setInterval(() => {
+                count++;
+                percent.innerText = count + '%';
+                if(count >= 100) {
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        loader.style.opacity = '0'; // 淡出
+                        setTimeout(() => { loader.style.display = 'none'; }, 1000);
+                    }, 500);
+                }
+            }, 20); // 这里的速度可以调
+        };
+
+        // 2. Before/After 滑块逻辑
+        const container = document.getElementById('slider-container');
+        const beforeImg = document.getElementById('before-img');
+        const handle = document.getElementById('handle');
+
+        container.addEventListener('mousemove', (e) => {
+            let rect = container.getBoundingClientRect();
+            let x = e.clientX - rect.left;
+            
+            if (x < 0) x = 0;
+            if (x > rect.width) x = rect.width;
+
+            beforeImg.style.width = x + 'px';
+            handle.style.left = x + 'px';
+        });
+        
+        // 触摸屏支持
+        container.addEventListener('touchmove', (e) => {
+            let rect = container.getBoundingClientRect();
+            let x = e.touches[0].clientX - rect.left;
+            if (x > 0 && x < rect.width) {
+                beforeImg.style.width = x + 'px';
+                handle.style.left = x + 'px';
+            }
+        });
+    </script>
+</body>
+</html>
